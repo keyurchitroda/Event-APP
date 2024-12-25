@@ -1,18 +1,23 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
+// This function can be marked `async` if using `await` inside
+export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  const isPublicPath = path === "/login" || path === "/register";
 
-export default clerkMiddleware(async (auth, request) => {
-  if (!isPublicRoute(request)) {
-    await auth.protect();
+  const token = request.cookies.get("token")?.value || "";
+  const userDetails: any = request.cookies.get("user")?.value;
+
+  const userParseDet = userDetails ? JSON.parse(userDetails) : {};
+  if (isPublicPath && token) {
+    return NextResponse.redirect(new URL("/", request.nextUrl));
   }
-});
+  if (!isPublicPath && !token) {
+    return NextResponse.redirect(new URL("/login", request.nextUrl));
+  }
+}
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/login", "/register", "/", "/test"],
 };
