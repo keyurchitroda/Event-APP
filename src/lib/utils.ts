@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-
+import crypto from "crypto";
 import { twMerge } from "tailwind-merge";
 import qs from "query-string";
 import { RemoveUrlQueryParams, UrlQueryParams } from "../../types";
@@ -101,4 +101,22 @@ export function removeKeysFromQuery({
 export const handleError = (error: unknown) => {
   console.error(error);
   throw new Error(typeof error === "string" ? error : JSON.stringify(error));
+};
+
+export async function convertFileToBuffer(file: File) {
+  const arrayBuffer = await file.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}
+
+export const randomString = (length = 5) => {
+  return crypto
+    .randomBytes(Math.ceil(length / 2))
+    .toString("hex")
+    .slice(0, length);
+};
+
+export const getPagination = (page: number, size: number) => {
+  const limit1 = size ? +size : 1;
+  const offset = (page - 1) * limit1;
+  return { limit1, offset };
 };

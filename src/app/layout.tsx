@@ -9,6 +9,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
+import { Providers } from "@/components/shared/Providers";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -34,7 +35,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.variable}`}>
         <Toaster position="top-center" reverseOrder={false} />
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
     // </ClerkProvider>
